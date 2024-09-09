@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>스네이크 게임 퀴즈</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #F0F0F0;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+      font-size: 2rem;
+    }
+
+    .quiz-container {
+      background-color: white;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .quiz-container p {
+      margin-bottom: 15px;
+      font-size: 1.1rem;
+    }
+
+    .quiz-container input[type="radio"] {
+      margin-right: 10px;
+    }
+
+    .quiz-container label {
+      font-size: 1rem;
+      margin-left: 5px;
+    }
+
+    button {
+      display: block;
+      background-color: #4CAF50;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 20px;
+      font-size: 1rem;
+      text-align: center;
+      width: 100%;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    .answer {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+
+    .correct {
+      background-color: #e0f7e0;
+      color: #2d6a2d;
+    }
+
+    .incorrect {
+      background-color: #f7e0e0;
+      color: #a33a3a;
+    }
+
+    #result {
+      margin-top: 30px;
+      font-size: 1.2rem;
+      text-align: center;
+      padding: 10px;
+      background-color: #f0f0f0;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+
+    #prize-btn {
+      display: none; /* 처음에는 버튼을 숨김 */
+      margin-top: 20px;
+    }
+
+    .quiz-question {
+      margin-bottom: 30px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>스네이크 게임 퀴즈</h1>
+
+<div class="quiz-container">
+  <form id="quiz-form">
+
+    <!-- 문제 1 -->
+    <div class="quiz-question">
+      <p>1. 뱀이 경계선을 넘으면 호출되는 함수는?</p>
+      <input type="radio" id="q1-setup" name="q1" value="setup">
+      <label for="q1-setup">setup</label><br>
+
+      <input type="radio" id="q1-gameOver" name="q1" value="gameOver">
+      <label for="q1-gameOver">gameOver</label><br>
+
+      <input type="radio" id="q1-drawBorder" name="q1" value="drawBorder">
+      <label for="q1-drawBorder">drawBorder</label><br>
+
+      <p class="answer" id="q1-answer"></p> <!-- 해설 표시 영역 -->
+    </div>
+
+    <!-- 문제 2 -->
+    <div class="quiz-question">
+      <p>2. 뱀의 꼬리를 그리는 메서드는?</p>
+      <input type="radio" id="q2-update" name="q2" value="update">
+      <label for="q2-update">update</label><br>
+
+      <input type="radio" id="q2-draw" name="q2" value="draw">
+      <label for="q2-draw">draw</label><br>
+
+      <input type="radio" id="q2-reset" name="q2" value="reset">
+      <label for="q2-reset">reset</label><br>
+
+      <p class="answer" id="q2-answer"></p> <!-- 해설 표시 영역 -->
+    </div>
+
+    <!-- 문제 3 -->
+    <div class="quiz-question">
+      <p>3. 과일의 위치를 무작위로 설정하는 함수는?</p>
+      <input type="radio" id="q3-draw" name="q3" value="draw">
+      <label for="q3-draw">draw</label><br>
+
+      <input type="radio" id="q3-pickLocation" name="q3" value="pickLocation">
+      <label for="q3-pickLocation">pickLocation</label><br>
+
+      <input type="radio" id="q3-changeDirection" name="q3" value="changeDirection">
+      <label for="q3-changeDirection">changeDirection</label><br>
+
+      <p class="answer" id="q3-answer"></p> <!-- 해설 표시 영역 -->
+    </div>
+
+    <!-- 퀴즈 제출 버튼 -->
+    <button type="button" onclick="checkAnswers()">퀴즈 제출</button>
+  </form>
+
+  <div id="result"></div>
+
+  <!-- 선물 뽑기 버튼 -->
+  <button id="prize-btn">선물 뽑기</button>
+</div>
+
+<script>
+  const answers = {
+    q1: "gameOver",
+    q2: "draw",
+    q3: "pickLocation"
+  };
+
+  const explanations = {
+    q1: {
+      setup: "setup 함수는 게임이 시작될 때 뱀과 과일 객체를 생성하고 초기 위치를 설정하는 함수입니다.",
+      gameOver: "gameOver 함수는 뱀이 벽에 부딪히거나 자기 몸과 충돌할 때 호출되어 게임을 종료합니다.",
+      drawBorder: "drawBorder 함수는 게임 보드의 경계를 그려 경계를 시각적으로 표시합니다."
+    },
+    q2: {
+      update: "update 함수는 뱀의 위치를 업데이트하고 꼬리 길이를 관리하지만 화면에 그리지는 않습니다.",
+      draw: "draw 함수는 뱀의 머리와 꼬리를 화면에 그리는 역할을 합니다.",
+      reset: "reset 함수는 뱀의 위치와 상태를 초기화하는 함수입니다."
+    },
+    q3: {
+      draw: "draw 함수는 과일을 화면에 그리는 함수입니다.",
+      pickLocation: "pickLocation 함수는 과일의 위치를 무작위로 설정하는 함수입니다.",
+      changeDirection: "changeDirection 함수는 뱀의 이동 방향을 변경하는 함수입니다."
+    }
+  };
+
+  function checkAnswers() {
+    const quizForm = document.getElementById("quiz-form");
+    let score = 0;
+
+    // 문제 1 채점 및 해설 출력
+    const q1Selected = quizForm.querySelector('input[name="q1"]:checked');
+    const q1Answer = document.getElementById("q1-answer");
+    if (q1Selected) {
+      if (q1Selected.value === answers.q1) {
+        score++;
+        q1Answer.className = "answer correct";
+        q1Answer.textContent = "정답입니다! " + explanations.q1[q1Selected.value];
+      } else {
+        q1Answer.className = "answer incorrect";
+        q1Answer.textContent = "오답입니다. " + explanations.q1[q1Selected.value];
+      }
+    } else {
+      q1Answer.textContent = "답을 선택하세요.";
+    }
+
+    // 문제 2 채점 및 해설 출력
+    const q2Selected = quizForm.querySelector('input[name="q2"]:checked');
+    const q2Answer = document.getElementById("q2-answer");
+    if (q2Selected) {
+      if (q2Selected.value === answers.q2) {
+        score++;
+        q2Answer.className = "answer correct";
+        q2Answer.textContent = "정답입니다! " + explanations.q2[q2Selected.value];
+      } else {
+        q2Answer.className = "answer incorrect";
+        q2Answer.textContent = "오답입니다. " + explanations.q2[q2Selected.value];
+      }
+    } else {
+      q2Answer.textContent = "답을 선택하세요.";
+    }
+
+    // 문제 3 채점 및 해설 출력
+    const q3Selected = quizForm.querySelector('input[name="q3"]:checked');
+    const q3Answer = document.getElementById("q3-answer");
+    if (q3Selected) {
+      if (q3Selected.value === answers.q3) {
+        score++;
+        q3Answer.className = "answer correct";
+        q3Answer.textContent = "정답입니다! " + explanations.q3[q3Selected.value];
+      } else {
+        q3Answer.className = "answer incorrect";
+        q3Answer.textContent = "오답입니다. " + explanations.q3[q3Selected.value];
+      }
+    } else {
+      q3Answer.textContent = "답을 선택하세요.";
+    }
+
+    // 최종 점수 출력
+    const result = document.getElementById("result");
+    result.textContent = `총 ${score}/3 맞았습니다!`;
+
+    // 모든 문제를 맞추면 '선물뽑기' 버튼 표시
+    const prizeBtn = document.getElementById("prize-btn");
+    if (score === 3) {
+      prizeBtn.style.display = "block";
+    } else {
+      prizeBtn.style.display = "none";
+    }
+  }
+</script>
+
+</body>
+</html>

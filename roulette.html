@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>룰렛 게임</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #F0F0F0;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+      text-align: center;
+    }
+
+    h1 {
+      color: #333;
+      font-size: 2rem;
+      margin-bottom: 40px;
+    }
+
+    #roulette-container {
+      position: relative;
+      margin: 0 auto;
+      width: 300px;
+      height: 300px;
+    }
+
+    #roulette-wheel {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 10px solid #4CAF50;
+      background-image: conic-gradient(
+          #FF6384 0deg 45deg,
+          #36A2EB 45deg 90deg,
+          #FFCE56 90deg 135deg,
+          #4BC0C0 135deg 180deg,
+          #FF6384 180deg 225deg,
+          #36A2EB 225deg 270deg,
+          #FFCE56 270deg 315deg,
+          #4BC0C0 315deg 360deg
+      );
+      transition: transform 4s ease-out;
+    }
+
+    #roulette-pointer {
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 15px solid transparent;
+      border-right: 15px solid transparent;
+      border-bottom: 30px solid red;
+    }
+
+    #spin-button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 15px 30px;
+      border: none;
+      border-radius: 5px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      margin-top: 30px;
+    }
+
+    #spin-button:hover {
+      background-color: #45a049;
+    }
+
+    #result {
+      margin-top: 40px;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+<h1>룰렛 게임</h1>
+
+<div id="roulette-container">
+  <div id="roulette-pointer"></div>
+  <div id="roulette-wheel"></div>
+</div>
+
+<button id="spin-button">돌려 돌려 룰렛!</button>
+
+<div id="result"></div>
+
+<script>
+  const wheel = document.getElementById("roulette-wheel");
+  const resultDiv = document.getElementById("result");
+  const spinButton = document.getElementById("spin-button");
+
+  // 룰렛 섹션 텍스트 (룰렛의 각 구역을 설명)
+  const sections = [
+    "상품 1",
+    "상품 2",
+    "상품 3",
+    "상품 4",
+    "상품 5",
+    "상품 6",
+    "상품 7",
+    "상품 8"
+  ];
+
+  function spinWheel() {
+    // 룰렛 회전각을 랜덤으로 설정
+    const randomDegree = Math.floor(Math.random() * 360) + 720; // 최소 720도 회전
+    const sectionAngle = 360 / sections.length;
+
+    // 룰렛 회전 애니메이션
+    wheel.style.transform = `rotate(${randomDegree}deg)`;
+
+    // 룰렛이 멈춘 후 결과 계산
+    setTimeout(() => {
+      const finalAngle = randomDegree % 360;
+      const sectionIndex = Math.floor(finalAngle / sectionAngle);
+      const selectedSection = sections[sections.length - 1 - sectionIndex];
+      resultDiv.textContent = `축하합니다! ${selectedSection}에 당첨되셨습니다!`;
+    }, 4000); // 4초 동안 회전 후 결과 출력
+  }
+
+  spinButton.addEventListener("click", spinWheel);
+</script>
+
+</body>
+</html>
