@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>스도쿠 퍼즐</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      gap: 20px;
+    }
+
+    .container {
+      display: flex;
+      gap: 50px;
+    }
+
+    .sudoku-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .sudoku-board {
+      display: grid;
+      grid-template-columns: repeat(9, 40px);
+      grid-template-rows: repeat(9, 40px);
+      gap: 2px;
+      margin-bottom: 10px;
+    }
+
+    .cell {
+      width: 40px;
+      height: 40px;
+      text-align: center;
+      font-size: 1.5rem;
+      line-height: 40px;
+      border: 1px solid #333;
+      background-color: #fff;
+    }
+
+    .preset {
+      background-color: #ddd; /* 미리 설정된 숫자 */
+      font-weight: bold;
+    }
+
+    .dynamic {
+      background-color: #b3e5fc; /* 동적으로 바뀌는 숫자 */
+      transition: background-color 0.5s;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 1rem;
+      cursor: pointer;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    .stats {
+      font-size: 1.2rem;
+      text-align: center;
+    }
+
+    #start-all-btn {
+      margin-top: 20px;
+    }
+
+    #explanation-btn {
+      margin-top: 10px;
+      background-color: #2196f3;
+    }
+
+    #explanation-btn:hover {
+      background-color: #1976d2;
+    }
+  </style>
+</head>
+<body>
+
+<h1>스도쿠 퍼즐 풀이</h1>
+
+<div class="container">
+  <div class="sudoku-section">
+    <div id="backtracking-board" class="sudoku-board"></div>
+    <div class="stats">
+      <p id="backtracking-attempts">백트래킹 시도 횟수: 0</p>
+      <p id="backtracking-time">백트래킹 걸린 시간: 0.00초</p>
+    </div>
+  </div>
+
+  <div class="sudoku-section">
+    <div id="heuristic-board" class="sudoku-board"></div>
+    <div class="stats">
+      <p id="heuristic-attempts">휴리스틱 시도 횟수: 0</p>
+      <p id="heuristic-time">휴리스틱 걸린 시간: 0.00초</p>
+    </div>
+  </div>
+</div>
+
+<button id="start-all-btn">두 퍼즐 모두 시작</button>
+
+<button id="explanation-btn">해설 보기</button>
+
+<script src="backtracking.js"></script>
+<script src="heuristic.js"></script>
+<script>
+  const boards = {
+    backtracking: [
+      [0, 0, 0, 0, 0, 0, 0, 1, 0],
+      [4, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 2, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 6, 0, 0, 0],
+      [0, 0, 0, 3, 0, 0, 5, 0, 0],
+      [0, 0, 0, 0, 9, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 7, 0],
+      [0, 0, 0, 8, 0, 0, 0, 0, 0],
+      [0, 1, 0, 0, 0, 0, 0, 0, 0]
+    ],
+    heuristic: [
+      [0, 0, 0, 0, 0, 0, 0, 1, 0],
+      [4, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 2, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 6, 0, 0, 0],
+      [0, 0, 0, 3, 0, 0, 5, 0, 0],
+      [0, 0, 0, 0, 9, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 7, 0],
+      [0, 0, 0, 8, 0, 0, 0, 0, 0],
+      [0, 1, 0, 0, 0, 0, 0, 0, 0]
+    ]
+  };
+
+  let backtrackingStartTime, heuristicStartTime;
+  let backtrackingTimerInterval, heuristicTimerInterval;
+
+  // 보드 초기화 함수
+  function createBoard(boardId, boardData) {
+    const boardEl = document.getElementById(boardId);
+    boardEl.innerHTML = ''; // 보드 초기화
+    for (let row = 0; row < 9; row++) {
+      for (let col = 0; col < 9; col++) {
+        const cell = document.createElement('div');
+        cell.classList.add('cell');
+        if (boardData[row][col] !== 0) {
+          cell.classList.add('preset');
+          cell.textContent = boardData[row][col];
+        }
+        boardEl.appendChild(cell);
+      }
+    }
+  }
+
+  // 보드 업데이트 함수
+  function updateBoard(boardId) {
+    const boardEl = document.getElementById(`${boardId}-board`);
+    const cells = boardEl.querySelectorAll('.cell');
+    const board = boards[boardId];
+    for (let row = 0; row < 9; row++) {
+      for (let col = 0; col < 9; col++) {
+        const cell = cells[row * 9 + col];
+        if (board[row][col] !== 0) {
+          cell.textContent = board[row][col];
+          cell.classList.add('dynamic');
+        } else {
+          cell.textContent = '';
+          cell.classList.remove('dynamic');
+        }
+      }
+    }
+  }
+
+  // 실시간 타이머 함수
+  function startTimer(boardId) {
+    const startTime = performance.now();
+
+    if (boardId === 'backtracking') {
+      backtrackingStartTime = startTime;
+      backtrackingTimerInterval = setInterval(() => {
+        const elapsedTime = (performance.now() - backtrackingStartTime) / 1000;
+        document.getElementById('backtracking-time').textContent = `백트래킹 걸린 시간: ${elapsedTime.toFixed(2)}초`;
+      }, 100);
+    } else if (boardId === 'heuristic') {
+      heuristicStartTime = startTime;
+      heuristicTimerInterval = setInterval(() => {
+        const elapsedTime = (performance.now() - heuristicStartTime) / 1000;
+        document.getElementById('heuristic-time').textContent = `휴리스틱 걸린 시간: ${elapsedTime.toFixed(2)}초`;
+      }, 100);
+    }
+  }
+
+  // 타이머 종료 함수
+  function stopTimer(boardId) {
+    if (boardId === 'backtracking') {
+      clearInterval(backtrackingTimerInterval);
+    } else if (boardId === 'heuristic') {
+      clearInterval(heuristicTimerInterval);
+    }
+  }
+
+  // 백트래킹 및 휴리스틱 시작 버튼 핸들러
+  document.getElementById('start-all-btn').addEventListener('click', () => {
+    createBoard('backtracking-board', boards.backtracking);
+    createBoard('heuristic-board', boards.heuristic);
+    startTimer('backtracking');
+    startTimer('heuristic');
+    backtrackingSolver().then(() => stopTimer('backtracking'));
+    heuristicBacktrackingSolver().then(() => stopTimer('heuristic'));
+  });
+
+  // 해설 보기 버튼 (기능 추가를 위한 핸들러, 필요 시 수정 가능)
+  document.getElementById('explanation-btn').addEventListener('click', () => {
+    alert("해설 보기 기능이 준비 중입니다.");
+  });
+
+  // 페이지 로드 시 초기 보드 생성
+  createBoard('backtracking-board', boards.backtracking);
+  createBoard('heuristic-board', boards.heuristic);
+</script>
+</body>
+</html>
