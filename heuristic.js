@@ -56,7 +56,7 @@ async function heuristicBacktrackingSolver() {
       updateBoard('heuristic');
       document.getElementById(
           'heuristic-attempts').textContent = `시도 횟수: ${attempts}`;
-      await sleep(10); // 각 숫자 업데이트 시 지연
+      await sleep(1); // 각 숫자 업데이트 시 지연
 
       if (await solve()) {
         return true;
@@ -65,7 +65,7 @@ async function heuristicBacktrackingSolver() {
       // 백트래킹 (잘못된 경우 숫자 되돌림)
       boards.heuristic[row][col] = 0;
       updateBoard('heuristic');
-      await sleep(10);
+      await sleep(1);
     }
     return false;
   }

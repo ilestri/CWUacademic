@@ -29,7 +29,7 @@ async function backtrackingSolver() {
         attempts++; // 시도 횟수 증가
         updateBoard('backtracking'); // 보드 업데이트
         document.getElementById('backtracking-attempts').textContent = `시도 횟수: ${attempts}`;
-        await sleep(10); // 0.2초 지연
+        await sleep(1); // 0.2초 지연
 
         if (await solve(row, col + 1)) {
           return true; // 다음 셀이 풀리면 종료
@@ -37,7 +37,7 @@ async function backtrackingSolver() {
 
         boards.backtracking[row][col] = 0; // 백트래킹 (다음 셀이 안 풀리면 0으로 되돌리기)
         updateBoard('backtracking');
-        await sleep(10); // 백트래킹 시에도 지연
+        await sleep(1); // 백트래킹 시에도 지연
       }
     }
     return false; // 숫자가 없으면 false 반환

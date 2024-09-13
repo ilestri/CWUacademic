@@ -43,6 +43,7 @@
       line-height: 40px;
       border: 1px solid #333;
       background-color: #fff;
+      font-family: inherit;
     }
 
     .preset {
@@ -50,9 +51,16 @@
       font-weight: bold;
     }
 
-    .dynamic {
-      background-color: #b3e5fc; /* 동적으로 바뀌는 숫자 */
-      transition: background-color 0.5s;
+    .user-input {
+      background-color: #ffeb3b; /* 사용자가 입력한 숫자 */
+      font-weight: bold;
+      color: #333;
+    }
+
+    .computer-input {
+      background-color: #b3e5fc; /* 컴퓨터가 푸는 숫자 */
+      font-weight: bold;
+      color: #333;
     }
 
     button {
@@ -120,63 +128,85 @@
 <script>
   const boards = {
     backtracking: [
-      [0, 0, 0, 0, 0, 0, 0, 1, 0],
-      [4, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 2, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 6, 0, 0, 0],
-      [0, 0, 0, 3, 0, 0, 5, 0, 0],
-      [0, 0, 0, 0, 9, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 7, 0],
-      [0, 0, 0, 8, 0, 0, 0, 0, 0],
-      [0, 1, 0, 0, 0, 0, 0, 0, 0]
+      [0, 0, 0, 7, 5, 0, 0, 3, 0],
+      [1, 0, 6, 0, 0, 0, 0, 0, 0],
+      [8, 0, 0, 3, 0, 0, 0, 0, 0],
+      [0, 2, 0, 0, 0, 0, 0, 4, 0],
+      [0, 0, 0, 6, 0, 0, 8, 0, 0],
+      [0, 0, 0, 0, 0, 1, 0, 0, 0],
+      [0, 4, 0, 0, 9, 0, 0, 0, 0],
+      [3, 0, 0, 0, 4, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 1, 0, 0]
     ],
     heuristic: [
-      [0, 0, 0, 0, 0, 0, 0, 1, 0],
-      [4, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 2, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 6, 0, 0, 0],
-      [0, 0, 0, 3, 0, 0, 5, 0, 0],
-      [0, 0, 0, 0, 9, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 7, 0],
-      [0, 0, 0, 8, 0, 0, 0, 0, 0],
-      [0, 1, 0, 0, 0, 0, 0, 0, 0]
+      [0, 0, 0, 7, 5, 0, 0, 3, 0],
+      [1, 0, 6, 0, 0, 0, 0, 0, 0],
+      [8, 0, 0, 3, 0, 0, 0, 0, 0],
+      [0, 2, 0, 0, 0, 0, 0, 4, 0],
+      [0, 0, 0, 6, 0, 0, 8, 0, 0],
+      [0, 0, 0, 0, 0, 1, 0, 0, 0],
+      [0, 4, 0, 0, 9, 0, 0, 0, 0],
+      [3, 0, 0, 0, 4, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 1, 0, 0]
     ]
   };
 
-  let backtrackingStartTime, heuristicStartTime;
-  let backtrackingTimerInterval, heuristicTimerInterval;
-
-  // 보드 초기화 함수
-  function createBoard(boardId, boardData) {
+  // 보드 초기화 함수 (모든 셀 수정 가능)
+  function createEditableBoard(boardId, boardData) {
     const boardEl = document.getElementById(boardId);
     boardEl.innerHTML = ''; // 보드 초기화
     for (let row = 0; row < 9; row++) {
       for (let col = 0; col < 9; col++) {
-        const cell = document.createElement('div');
-        cell.classList.add('cell');
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.maxLength = 1;
+        input.classList.add('cell');
         if (boardData[row][col] !== 0) {
-          cell.classList.add('preset');
-          cell.textContent = boardData[row][col];
+          input.classList.add('preset');
+          input.value = boardData[row][col];
+        } else {
+          input.value = '';
         }
-        boardEl.appendChild(cell);
+
+        input.addEventListener('input', (e) => handleInputChange(e, row, col));
+
+        boardEl.appendChild(input);
       }
     }
   }
 
-  // 보드 업데이트 함수
+  // 사용자가 입력한 값을 양쪽 보드에 동기화하고 색상 설정
+  function handleInputChange(e, row, col) {
+    const value = parseInt(e.target.value);
+    if (!isNaN(value) && value >= 1 && value <= 9) {
+      boards.backtracking[row][col] = value;
+      boards.heuristic[row][col] = value;
+
+      const cells = document.querySelectorAll('.cell');
+      cells.forEach(cell => cell.classList.remove('computer-input')); // 사용자가 직접 입력하면 컴퓨터의 풀이 색 제거
+      e.target.classList.add('user-input'); // 사용자 입력 색상 추가
+    } else {
+      boards.backtracking[row][col] = 0;
+      boards.heuristic[row][col] = 0;
+    }
+    updateBoard('backtracking');
+    updateBoard('heuristic');
+  }
+
+  // 보드 업데이트 함수 (컴퓨터 풀이 시 색상 변경)
   function updateBoard(boardId) {
     const boardEl = document.getElementById(`${boardId}-board`);
-    const cells = boardEl.querySelectorAll('.cell');
+    const cells = boardEl.querySelectorAll('input.cell');
     const board = boards[boardId];
     for (let row = 0; row < 9; row++) {
       for (let col = 0; col < 9; col++) {
         const cell = cells[row * 9 + col];
         if (board[row][col] !== 0) {
-          cell.textContent = board[row][col];
-          cell.classList.add('dynamic');
+          cell.value = board[row][col];
+          cell.classList.add('computer-input'); // 컴퓨터가 푼 숫자는 색상 변경
         } else {
-          cell.textContent = '';
-          cell.classList.remove('dynamic');
+          cell.value = '';
+          cell.classList.remove('computer-input');
         }
       }
     }
@@ -190,13 +220,15 @@
       backtrackingStartTime = startTime;
       backtrackingTimerInterval = setInterval(() => {
         const elapsedTime = (performance.now() - backtrackingStartTime) / 1000;
-        document.getElementById('backtracking-time').textContent = `백트래킹 걸린 시간: ${elapsedTime.toFixed(2)}초`;
+        document.getElementById(
+            'backtracking-time').textContent = `백트래킹 걸린 시간: ${elapsedTime.toFixed(2)}초`;
       }, 100);
     } else if (boardId === 'heuristic') {
       heuristicStartTime = startTime;
       heuristicTimerInterval = setInterval(() => {
         const elapsedTime = (performance.now() - heuristicStartTime) / 1000;
-        document.getElementById('heuristic-time').textContent = `휴리스틱 걸린 시간: ${elapsedTime.toFixed(2)}초`;
+        document.getElementById('heuristic-time').textContent = `휴리스틱 걸린 시간: ${elapsedTime.toFixed(
+            2)}초`;
       }, 100);
     }
   }
@@ -212,8 +244,8 @@
 
   // 백트래킹 및 휴리스틱 시작 버튼 핸들러
   document.getElementById('start-all-btn').addEventListener('click', () => {
-    createBoard('backtracking-board', boards.backtracking);
-    createBoard('heuristic-board', boards.heuristic);
+    createEditableBoard('backtracking-board', boards.backtracking);
+    createEditableBoard('heuristic-board', boards.heuristic);
     startTimer('backtracking');
     startTimer('heuristic');
     backtrackingSolver().then(() => stopTimer('backtracking'));
@@ -226,8 +258,8 @@
   });
 
   // 페이지 로드 시 초기 보드 생성
-  createBoard('backtracking-board', boards.backtracking);
-  createBoard('heuristic-board', boards.heuristic);
+  createEditableBoard('backtracking-board', boards.backtracking);
+  createEditableBoard('heuristic-board', boards.heuristic);
 </script>
 </body>
 </html>
