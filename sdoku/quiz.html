@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>스도쿠 알고리즘 퀴즈</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #F0F0F0;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+      font-size: 2rem;
+    }
+
+    .quiz-container {
+      background-color: white;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .quiz-container p {
+      margin-bottom: 15px;
+      font-size: 1.1rem;
+    }
+
+    .quiz-container input[type="radio"] {
+      margin-right: 10px;
+    }
+
+    .quiz-container label {
+      font-size: 1rem;
+      margin-left: 5px;
+    }
+
+    button {
+      display: block;
+      background-color: #4CAF50;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 20px;
+      font-size: 1rem;
+      text-align: center;
+      width: 100%;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    .answer {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+
+    .correct {
+      background-color: #e0f7e0;
+      color: #2d6a2d;
+    }
+
+    .incorrect {
+      background-color: #f7e0e0;
+      color: #a33a3a;
+    }
+
+    #result {
+      margin-top: 30px;
+      font-size: 1.2rem;
+      text-align: center;
+      padding: 10px;
+      background-color: #f0f0f0;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+
+    #prize-btn {
+      display: none; /* 처음에는 버튼을 숨김 */
+      margin-top: 20px;
+    }
+
+    .quiz-question {
+      margin-bottom: 30px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>스도쿠 알고리즘 퀴즈</h1>
+
+<div class="quiz-container">
+  <form id="quiz-form">
+
+    <!-- 문제 1: 백트래킹 관련 -->
+    <div class="quiz-question">
+      <p>1. 백트래킹 알고리즘에서 빈 칸에 숫자를 넣었을 때 조건을 만족하지 않으면 어떻게 하나요?</p>
+      <input type="radio" id="q1-retry" name="q1" value="retry">
+      <label for="q1-retry">다른 값을 넣을 때까지 계속 시도한다</label><br>
+
+      <input type="radio" id="q1-backtrack" name="q1" value="backtrack">
+      <label for="q1-backtrack">이전 단계로 돌아가서 다른 숫자를 시도한다</label><br>
+
+      <input type="radio" id="q1-stop" name="q1" value="stop">
+      <label for="q1-stop">풀이를 중단한다</label><br>
+
+      <p class="answer" id="q1-answer"></p> <!-- 해설 표시 영역 -->
+    </div>
+
+    <!-- 문제 2: 백트래킹 관련 (변경된 문제) -->
+    <div class="quiz-question">
+      <p>2. 백트래킹 알고리즘에서 재귀 호출의 역할은 무엇인가요?</p>
+      <input type="radio" id="q2-solve" name="q2" value="solve">
+      <label for="q2-solve">각 칸에 숫자를 채워나가며 퍼즐을 해결한다</label><br>
+
+      <input type="radio" id="q2-check" name="q2" value="check">
+      <label for="q2-check">각 셀의 유효성을 검사한다</label><br>
+
+      <input type="radio" id="q2-back" name="q2" value="back">
+      <label for="q2-back">이전 상태로 되돌린다</label><br>
+
+      <p class="answer" id="q2-answer"></p> <!-- 해설 표시 영역 -->
+    </div>
+
+    <!-- 문제 3: 휴리스틱 관련 -->
+    <div class="quiz-question">
+      <p>3. 휴리스틱 백트래킹에서 가장 먼저 해결하려고 하는 셀은 어떤 특성을 가지고 있나요?</p>
+      <input type="radio" id="q3-most-options" name="q3" value="most-options">
+      <label for="q3-most-options">가장 많은 숫자 후보가 있는 셀</label><br>
+
+      <input type="radio" id="q3-least-options" name="q3" value="least-options">
+      <label for="q3-least-options">가장 적은 숫자 후보가 있는 셀</label><br>
+
+      <input type="radio" id="q3-empty" name="q3" value="empty">
+      <label for="q3-empty">비어 있는 셀</label><br>
+
+      <p class="answer" id="q3-answer"></p> <!-- 해설 표시 영역 -->
+    </div>
+
+    <!-- 문제 4: 휴리스틱 관련 -->
+    <div class="quiz-question">
+      <p>4. 휴리스틱 백트래킹이 일반 백트래킹보다 효율적인 이유는 무엇인가요?</p>
+      <input type="radio" id="q4-fewer-options" name="q4" value="fewer-options">
+      <label for="q4-fewer-options">숫자 후보가 적은 셀을 먼저 해결해 탐색 공간을 줄이기 때문</label><br>
+
+      <input type="radio" id="q4-random" name="q4" value="random">
+      <label for="q4-random">숫자를 무작위로 넣기 때문</label><br>
+
+      <input type="radio" id="q4-all-cells" name="q4" value="all-cells">
+      <label for="q4-all-cells">모든 셀을 한꺼번에 처리하기 때문</label><br>
+
+      <p class="answer" id="q4-answer"></p> <!-- 해설 표시 영역 -->
+    </div>
+
+    <!-- 문제 5: 알고리즘에 대한 이해 -->
+    <div class="quiz-question">
+      <p>5. 백트래킹과 휴리스틱 백트래킹 모두 어떤 문제 유형을 해결하기 위한 알고리즘인가요?</p>
+      <input type="radio" id="q5-search" name="q5" value="search">
+      <label for="q5-search">탐색 및 제약 조건을 만족하는 문제</label><br>
+
+      <input type="radio" id="q5-sorting" name="q5" value="sorting">
+      <label for="q5-sorting">정렬 문제</label><br>
+
+      <input type="radio" id="q5-dynamic" name="q5" value="dynamic">
+      <label for="q5-dynamic">동적 계획법 문제</label><br>
+
+      <p class="answer" id="q5-answer"></p> <!-- 해설 표시 영역 -->
+    </div>
+
+    <!-- 퀴즈 제출 버튼 -->
+    <button type="button" onclick="checkAnswers()">퀴즈 제출</button>
+  </form>
+
+  <div id="result"></div>
+
+  <!-- 선물 뽑기 버튼 -->
+  <button id="prize-btn" onclick="location.href='../roulette.html'">선물 뽑기</button>
+</div>
+
+<script>
+  const answers = {
+    q1: "backtrack",
+    q2: "solve",
+    q3: "least-options",
+    q4: "fewer-options",
+    q5: "search"
+  };
+
+  const explanations = {
+    q1: {
+      retry: "다른 값을 넣기만 반복하면 되돌아가서 다른 경로를 탐색하지 못합니다.",
+      backtrack: "정답입니다! 백트래킹은 이전 단계로 돌아가서 다른 경로를 탐색하는 알고리즘입니다.",
+      stop: "백트래킹은 문제 해결이 불가능하지 않으면 중단하지 않습니다."
+    },
+    q2: {
+      solve: "정답입니다! 백트래킹의 재귀 호출은 각 셀을 해결하면서 다음 단계로 이동하는 역할을 합니다.",
+      check: "유효성 검사는 다른 함수에서 이루어지며, 재귀 호출은 퍼즐을 해결하기 위한 방법입니다.",
+      back: "되돌리기는 특정 조건을 만족하지 않았을 때 수행되며, 재귀 호출 자체의 주 역할은 아닙니다."
+    },
+    q3: {
+      "most-options": "숫자 후보가 가장 많은 셀은 탐색 범위를 줄이기 어렵습니다.",
+      "least-options": "정답입니다! 휴리스틱은 가능한 후보가 적은 셀부터 해결해 효율성을 높입니다.",
+      empty: "빈 칸을 먼저 찾는 것은 백트래킹에서도 일반적으로 수행됩니다."
+    },
+    q4: {
+      "fewer-options": "정답입니다! 숫자 후보가 적은 셀을 먼저 해결하면 탐색 공간이 줄어듭니다.",
+      random: "무작위로 처리하는 것은 효율적인 방법이 아닙니다.",
+      "all-cells": "모든 셀을 한꺼번에 처리하는 것은 불가능합니다."
+    },
+    q5: {
+      search: "정답입니다! 백트래킹과 휴리스틱 백트래킹은 탐색과 제약 조건을 만족하는 문제를 해결하기 위한 알고리즘입니다.",
+      sorting: "이 알고리즘들은 정렬 문제와는 관련이 없습니다.",
+      dynamic: "동적 계획법은 백트래킹과는 다른 유형의 알고리즘입니다."
+    }
+  };
+
+  function checkAnswers() {
+    const quizForm = document.getElementById("quiz-form");
+    let score = 0;
+
+    // 문제 채점 및 해설 출력
+    ['q1', 'q2', 'q3', 'q4', 'q5'].forEach(q => {
+      const selected = quizForm.querySelector(`input[name="${q}"]:checked`);
+      const answerElement = document.getElementById(`${q}-answer`);
+      if (selected) {
+        if (selected.value === answers[q]) {
+          score++;
+          answerElement.className = "answer correct";
+          answerElement.textContent = `정답입니다! ${explanations[q][selected.value]}`;
+        } else {
+          answerElement.className = "answer incorrect";
+          answerElement.textContent = `오답입니다. ${explanations[q][selected.value]}`;
+        }
+      } else {
+        answerElement.textContent = "답을 선택하세요.";
+      }
+    });
+
+    // 최종 점수 출력
+    const result = document.getElementById("result");
+    result.textContent = `총 ${score}/5 맞았습니다!`;
+
+    // 모든 문제를 맞추면 '선물뽑기' 버튼 표시
+    const prizeBtn = document.getElementById("prize-btn");
+    if (score === 5) {
+      prizeBtn.style.display = "block";
+    } else {
+      prizeBtn.style.display = "none";
+    }
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>스도쿠 알고리즘 상세 설명</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #F0F0F0;
+      margin: 0;
+      padding: 20px;
+      line-height: 1.8;
+      color: #333;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+      font-size: 2rem;
+      margin-bottom: 40px;
+    }
+
+    .section {
+      background-color: white;
+      padding: 25px;
+      margin-bottom: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      color: #444;
+      margin-bottom: 15px;
+    }
+
+    p {
+      margin-bottom: 20px;
+      font-size: 1.1rem;
+      color: #555;
+    }
+
+    pre {
+      background-color: #F5F5F5;
+      padding: 20px;
+      border-radius: 8px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      font-size: 1rem;
+      color: #333;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 15px 25px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 30px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      font-size: 1.1rem;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    .section-code {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- 페이지 제목 -->
+<h1>스도쿠 퍼즐 해결 알고리즘 상세 설명</h1>
+
+<!-- 섹션 1: 백트래킹 알고리즘 -->
+<div class="section">
+  <h2>1. 백트래킹 알고리즘</h2>
+  <p><strong>역할:</strong> 백트래킹(Backtracking)은 스도쿠 퍼즐을 해결하는 기본적인 알고리즘입니다. 가능한 값을 하나씩 시도하고, 해당 값이 유효하지 않으면 되돌아가는 방식입니다. 이 알고리즘은 문제 해결 시 가능한 모든 경우의 수를 시도하는 방식으로 작동합니다.</p>
+
+  <p><strong>핵심 아이디어:</strong> 스도쿠는 9x9 그리드에 숫자를 채워야 하며, 각 행(row), 열(column), 3x3 박스(subgrid) 내에서는 중복된 숫자가 없어야 합니다. 백트래킹은 현재 셀에 가능한 숫자를 하나씩 넣고, 그 숫자가 유효한지 확인합니다. 유효하지 않으면 해당 값을 제거하고 다시 다른 값을 시도합니다. 가능한 모든 값을 시도한 후에도 유효한 숫자가 없다면 이전 셀로 돌아가 다시 시도하는 방식입니다.</p>
+
+  <p>백트래킹의 주요 특징은 **재귀 호출**을 사용한다는 점입니다. 재귀적으로 각 셀을 해결하며, 최종적으로 퍼즐을 완성하거나 불가능한 경로를 포기(백트래킹)합니다.</p>
+
+  <pre>
+async function backtrackingSolver() {
+  async function solve(row, col) {
+    // 1. 열이 9에 도달하면 다음 행으로 이동
+    if (col === 9) {
+      row++;
+      col = 0;
+    }
+
+    // 2. 마지막 행까지 도달하면 퍼즐이 해결됨
+    if (row === 9) {
+      return true; // 성공적으로 해결됨
+    }
+
+    // 3. 이미 숫자가 있는 셀은 건너뛰고 다음 셀로 이동
+    if (boards.backtracking[row][col] !== 0) {
+      return solve(row, col + 1);
+    }
+
+    // 4. 빈 칸에 1부터 9까지 숫자를 시도
+    for (let num = 1; num <= 9; num++) {
+      if (isValid(row, col, num, 'backtracking')) {
+        boards.backtracking[row][col] = num; // 숫자 넣기
+        if (await solve(row, col + 1)) { // 다음 셀이 해결되면 리턴
+          return true;
+        }
+        boards.backtracking[row][col] = 0; // 백트래킹 (실패 시 0으로 되돌림)
+      }
+    }
+    return false; // 모든 경우를 시도해도 해결되지 않으면 false
+  }
+
+  await solve(0, 0); // 첫 번째 셀부터 시작
+}
+  </pre>
+  <p>**코드 설명**:</p>
+  <ul>
+    <li><strong>solve 함수:</strong> 재귀적으로 각 셀에 숫자를 시도하는 함수입니다. 각 셀이 해결되면 다음 셀로 넘어가고, 모든 셀이 해결되면 퍼즐이 완성됩니다.</li>
+    <li><strong>isValid 함수:</strong> 현재 숫자가 해당 셀에 유효한지(행, 열, 3x3 박스에서 중복되지 않는지) 확인하는 함수입니다.</li>
+    <li>숫자를 넣은 후, 그 다음 셀이 해결되면 계속 진행하지만, 그렇지 않으면 백트래킹을 통해 이전 상태로 되돌아갑니다.</li>
+  </ul>
+</div>
+
+<!-- 섹션 2: 휴리스틱 백트래킹 알고리즘 -->
+<div class="section">
+  <h2>2. 휴리스틱 백트래킹 알고리즘</h2>
+  <p><strong>역할:</strong> 휴리스틱 백트래킹은 기본 백트래킹 알고리즘을 최적화한 방식입니다. 가능한 숫자 후보가 가장 적은 셀부터 채워나가는 방식으로, 탐색 공간을 줄여 보다 빠르게 문제를 해결할 수 있습니다. 즉, 문제를 풀기 어렵게 만드는 "핵심" 셀을 먼저 처리하여 전체적인 해결 속도를 높입니다.</p>
+
+  <p><strong>핵심 아이디어:</strong> 일반 백트래킹에서는 각 셀을 순차적으로 처리하지만, 휴리스틱을 도입하면 가능한 숫자 후보가 가장 적은 셀을 우선적으로 선택하여, 불필요한 시도를 줄일 수 있습니다. 이렇게 함으로써 알고리즘의 성능이 크게 향상됩니다.</p>
+
+  <pre>
+async function heuristicBacktrackingSolver() {
+  // 가능한 숫자 후보가 가장 적은 셀을 찾음
+  function findBestCell() {
+    let minOptions = 10; // 최대 후보는 9개이므로 10으로 시작
+    let bestCell = null;
+
+    for (let row = 0; row < 9; row++) {
+      for (let col = 0; col < 9; col++) {
+        if (boards.heuristic[row][col] === 0) {
+          const options = getOptions(row, col, 'heuristic');
+          if (options.length < minOptions) {
+            minOptions = options.length; // 후보가 적은 셀 갱신
+            bestCell = { row, col, options }; // 최적 셀 저장
+          }
+        }
+      }
+    }
+    return bestCell; // 가능한 후보가 가장 적은 셀 반환
+  }
+
+  async function solve() {
+    const bestCell = findBestCell(); // 최적의 셀 찾기
+    if (!bestCell) return true; // 모든 셀이 채워졌으면 성공
+
+    const { row, col, options } = bestCell; // 후보 값과 함께 셀 정보 가져오기
+    for (const num of options) {
+      boards.heuristic[row][col] = num; // 숫자를 넣고
+      if (await solve()) {
+        return true; // 해결되면 리턴
+      }
+      boards.heuristic[row][col] = 0; // 실패하면 백트래킹
+    }
+    return false; // 모든 경우 시도 후 실패 시 false
+  }
+
+  await solve(); // 첫 번째 셀부터 해결 시작
+}
+  </pre>
+
+  <p>**코드 설명**:</p>
+  <ul>
+    <li><strong>findBestCell 함수:</strong> 가능한 숫자 후보가 가장 적은 셀을 찾는 함수입니다. 이는 퍼즐을 해결하는 데 가장 중요한 단계입니다.</li>
+    <li><strong>getOptions 함수:</strong> 주어진 셀에 들어갈 수 있는 숫자 목록을 반환하는 함수입니다.</li>
+    <li>이 알고리즘은 어려운 셀을 먼저 해결하려고 하므로 백트래킹의 빈도와 깊이를 줄여 전체적인 효율성을 높입니다.</li>
+  </ul>
+</div>
+
+<!-- 퀴즈 버튼 -->
+<button onclick="window.location.href='quiz.html'">퀴즈 풀기</button>
+
+</body>
+</html>

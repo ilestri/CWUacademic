@@ -1,5 +1,3 @@
-// heuristic.js
-
 async function heuristicBacktrackingSolver() {
   const startTime = performance.now();
   let attempts = 0;
