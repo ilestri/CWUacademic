@@ -44,24 +44,28 @@
       border: 1px solid #333;
       background-color: #fff;
       font-family: inherit;
+      outline: none;
     }
 
-    .preset {
-      background-color: #ddd; /* 미리 설정된 숫자 */
-      font-weight: bold;
-    }
-
+    /* 사용자 입력 */
     .user-input {
-      background-color: #ffeb3b; /* 사용자가 입력한 숫자 */
+      background-color: #ffeb3b; /* 노란색 */
       font-weight: bold;
       color: #333;
     }
 
+    /* 컴퓨터가 푸는 값 */
     .computer-input {
-      background-color: #b3e5fc; /* 컴퓨터가 푸는 숫자 */
+      background-color: #b3e5fc; /* 파란색 */
       font-weight: bold;
       color: #333;
     }
+
+    /* 3x3 구분선 */
+    .top-border { border-top: 3px solid #333; }
+    .bottom-border { border-bottom: 3px solid #333; }
+    .left-border { border-left: 3px solid #333; }
+    .right-border { border-right: 3px solid #333; }
 
     button {
       padding: 10px 20px;
@@ -151,7 +155,7 @@
     ]
   };
 
-  // 보드 초기화 함수 (모든 셀 수정 가능)
+  // 보드 초기화 함수
   function createEditableBoard(boardId, boardData) {
     const boardEl = document.getElementById(boardId);
     boardEl.innerHTML = ''; // 보드 초기화
@@ -161,6 +165,13 @@
         input.type = 'text';
         input.maxLength = 1;
         input.classList.add('cell');
+
+        // 3x3 블록 구분선 적용
+        if (row % 3 === 0) input.classList.add('top-border');
+        if (row === 8) input.classList.add('bottom-border');
+        if (col % 3 === 0) input.classList.add('left-border');
+        if (col === 8) input.classList.add('right-border');
+
         if (boardData[row][col] !== 0) {
           input.classList.add('preset');
           input.value = boardData[row][col];
@@ -196,14 +207,17 @@
   // 보드 업데이트 함수 (컴퓨터 풀이 시 색상 변경)
   function updateBoard(boardId) {
     const boardEl = document.getElementById(`${boardId}-board`);
-    const cells = boardEl.querySelectorAll('input.cell');
+    const cells = boardEl.querySelectorAll('input');
     const board = boards[boardId];
+
     for (let row = 0; row < 9; row++) {
       for (let col = 0; col < 9; col++) {
         const cell = cells[row * 9 + col];
         if (board[row][col] !== 0) {
-          cell.value = board[row][col];
-          cell.classList.add('computer-input'); // 컴퓨터가 푼 숫자는 색상 변경
+          if (!cell.classList.contains('user-input')) {
+            cell.value = board[row][col];
+            cell.classList.add('computer-input');
+          }
         } else {
           cell.value = '';
           cell.classList.remove('computer-input');
