@@ -62,10 +62,21 @@
     }
 
     /* 3x3 구분선 */
-    .top-border { border-top: 3px solid #333; }
-    .bottom-border { border-bottom: 3px solid #333; }
-    .left-border { border-left: 3px solid #333; }
-    .right-border { border-right: 3px solid #333; }
+    .top-border {
+      border-top: 3px solid #333;
+    }
+
+    .bottom-border {
+      border-bottom: 3px solid #333;
+    }
+
+    .left-border {
+      border-left: 3px solid #333;
+    }
+
+    .right-border {
+      border-right: 3px solid #333;
+    }
 
     button {
       padding: 10px 20px;
@@ -125,33 +136,34 @@
 
 <button id="start-all-btn">두 퍼즐 모두 시작</button>
 
-<button id="explanation-btn">해설 보기</button>
+<button class="explanation-btn" onclick="window.location.href='explan.html'">설명 보기</button>
 
 <script src="backtracking.js"></script>
 <script src="heuristic.js"></script>
 <script>
   const boards = {
     backtracking: [
-      [0, 0, 5, 0, 2, 0, 0, 1, 0],
-      [0, 3, 8, 0, 0, 9, 0, 0, 0],
-      [2, 0, 0, 5, 0, 1, 0, 0, 4],
-      [0, 0, 0, 0, 7, 0, 0, 0, 0],
-      [0, 0, 7, 0, 8, 5, 0, 2, 9],
-      [5, 0, 4, 9, 0, 0, 0, 0, 0],
-      [7, 0, 0, 0, 0, 0, 8, 3, 0],
-      [0, 9, 3, 0, 0, 0, 7, 4, 0],
-      [4, 8, 0, 0, 0, 0, 1, 9, 0]
+      [0, 5, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 3, 0, 9, 0, 0, 6, 2],
+      [0, 0, 0, 0, 6, 0, 5, 3, 8],
+      [9, 0, 0, 0, 0, 1, 3, 4, 0],
+      [0, 0, 0, 0, 0, 0, 7, 0, 0],
+      [0, 3, 0, 2, 0, 0, 0, 0, 0],
+      [0, 0, 0, 9, 0, 5, 0, 8, 0],
+      [5, 0, 0, 0, 0, 7, 0, 0, 0],
+      [1, 0, 9, 6, 0, 0, 0, 0, 4]
     ],
+
     heuristic: [
-      [0, 0, 5, 0, 2, 0, 0, 1, 0],
-      [0, 3, 8, 0, 0, 9, 0, 0, 0],
-      [2, 0, 0, 5, 0, 1, 0, 0, 4],
-      [0, 0, 0, 0, 7, 0, 0, 0, 0],
-      [0, 0, 7, 0, 8, 5, 0, 2, 9],
-      [5, 0, 4, 9, 0, 0, 0, 0, 0],
-      [7, 0, 0, 0, 0, 0, 8, 3, 0],
-      [0, 9, 3, 0, 0, 0, 7, 4, 0],
-      [4, 8, 0, 0, 0, 0, 1, 9, 0]
+      [0, 5, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 3, 0, 9, 0, 0, 6, 2],
+      [0, 0, 0, 0, 6, 0, 5, 3, 8],
+      [9, 0, 0, 0, 0, 1, 3, 4, 0],
+      [0, 0, 0, 0, 0, 0, 7, 0, 0],
+      [0, 3, 0, 2, 0, 0, 0, 0, 0],
+      [0, 0, 0, 9, 0, 5, 0, 8, 0],
+      [5, 0, 0, 0, 0, 7, 0, 0, 0],
+      [1, 0, 9, 6, 0, 0, 0, 0, 4]
     ]
   };
 
@@ -167,10 +179,18 @@
         input.classList.add('cell');
 
         // 3x3 블록 구분선 적용
-        if (row % 3 === 0) input.classList.add('top-border');
-        if (row === 8) input.classList.add('bottom-border');
-        if (col % 3 === 0) input.classList.add('left-border');
-        if (col === 8) input.classList.add('right-border');
+        if (row % 3 === 0) {
+          input.classList.add('top-border');
+        }
+        if (row === 8) {
+          input.classList.add('bottom-border');
+        }
+        if (col % 3 === 0) {
+          input.classList.add('left-border');
+        }
+        if (col === 8) {
+          input.classList.add('right-border');
+        }
 
         if (boardData[row][col] !== 0) {
           input.classList.add('preset');
@@ -264,11 +284,6 @@
     startTimer('heuristic');
     backtrackingSolver().then(() => stopTimer('backtracking'));
     heuristicBacktrackingSolver().then(() => stopTimer('heuristic'));
-  });
-
-  // 해설 보기 버튼 (기능 추가를 위한 핸들러, 필요 시 수정 가능)
-  document.getElementById('explanation-btn').addEventListener('click', () => {
-    alert("해설 보기 기능이 준비 중입니다.");
   });
 
   // 페이지 로드 시 초기 보드 생성
