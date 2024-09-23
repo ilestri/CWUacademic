@@ -33,12 +33,14 @@
       border-radius: 50%;
       border: 10px solid #4CAF50;
       background-image: conic-gradient(
-          #ff0036 180deg 225deg,
-          #0098ff 225deg 270deg,
-          #ffb500 270deg 315deg,
-          #00ffff 315deg 360deg
+          #ff0036 0deg 96deg,   /* 상품 1: 첫번째 96도 */
+          #0098ff 96deg 146.4deg, /* 상품 2: 50.4도 */
+          #ff0036 146.4deg 242.4deg,  /* 상품 1: 두번째 96도 */
+          #ffb500 242.4deg 260.4deg,  /* 상품 3: 18도 */
+          #ff0036 260.4deg 356.4deg,  /* 상품 1: 세번째 96도 */
+          #00ffff 356.4deg 360deg  /* 상품 4: 3.6도 */
       );
-      transition: transform 4s ease-out;
+      transition-timing-function: ease-out;
     }
 
     #roulette-pointer {
@@ -50,7 +52,7 @@
       height: 0;
       border-left: 15px solid transparent;
       border-right: 15px solid transparent;
-      border-bottom: 30px solid red;
+      border-top: 30px solid red;
     }
 
     #spin-button {
@@ -73,6 +75,25 @@
       font-size: 1.5rem;
       font-weight: bold;
     }
+
+    /* 범례 스타일 */
+    .legend {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      margin: 0 15px;
+    }
+
+    .legend-color {
+      width: 20px;
+      height: 20px;
+      margin-right: 10px;
+    }
   </style>
 </head>
 <body>
@@ -88,34 +109,72 @@
 
 <div id="result"></div>
 
+<!-- 상품 범례 -->
+<div class="legend">
+  <div class="legend-item">
+    <div class="legend-color" style="background-color: #ff0036;"></div>
+    <span>상품 1 (80%)</span>
+  </div>
+  <div class="legend-item">
+    <div class="legend-color" style="background-color: #0098ff;"></div>
+    <span>상품 2 (14%)</span>
+  </div>
+  <div class="legend-item">
+    <div class="legend-color" style="background-color: #ffb500;"></div>
+    <span>상품 3 (5%)</span>
+  </div>
+  <div class="legend-item">
+    <div class="legend-color" style="background-color: #00ffff;"></div>
+    <span>상품 4 (1%)</span>
+  </div>
+</div>
+
 <script>
   const wheel = document.getElementById("roulette-wheel");
   const resultDiv = document.getElementById("result");
   const spinButton = document.getElementById("spin-button");
 
-  // 룰렛 섹션 텍스트 (룰렛의 각 구역을 설명)
+  // 룰렛 섹션 텍스트 및 확률
   const sections = [
-    "상품 1",
-    "상품 2",
-    "상품 3",
-    "상품 4",
+    { name: "상품 1", startAngle: 0, endAngle: 96 },
+    { name: "상품 2", startAngle: 96, endAngle: 146.4 },
+    { name: "상품 1", startAngle: 146.4, endAngle: 242.4 },
+    { name: "상품 3", startAngle: 242.4, endAngle: 260.4 },
+    { name: "상품 1", startAngle: 260.4, endAngle: 356.4 },
+    { name: "상품 4", startAngle: 356.4, endAngle: 360 }
   ];
 
+  let isSpinning = false; // 현재 룰렛이 회전 중인지 확인하는 변수
+  let currentRotation = 0; // 현재 회전각을 저장하는 변수
+
   function spinWheel() {
-    // 룰렛 회전각을 랜덤으로 설정
-    const randomDegree = Math.floor(Math.random() * 360) + 720; // 최소 720도 회전
-    const sectionAngle = 360 / sections.length;
+    if (isSpinning) return; // 룰렛이 돌고 있을 때는 중복 클릭을 방지
+
+    isSpinning = true; // 룰렛 회전 시작
+
+    const randomDegree = Math.floor(Math.random() * 360) + 2000; // 최소 2000도 회전
+    const randomTime = Math.random() * 2 + 5; // 회전 시간 5초에서 7초 사이 랜덤하게 설정
+
+    // 새로운 회전각: 현재 회전각에 추가하여 시계 방향으로만 회전
+    currentRotation += randomDegree;
 
     // 룰렛 회전 애니메이션
-    wheel.style.transform = `rotate(${randomDegree}deg)`;
+    wheel.style.transition = `transform ${randomTime}s ease-out`;
+    wheel.style.transform = `rotate(${currentRotation}deg)`;
 
     // 룰렛이 멈춘 후 결과 계산
     setTimeout(() => {
-      const finalAngle = randomDegree % 360;
-      const sectionIndex = Math.floor(finalAngle / sectionAngle);
-      const selectedSection = sections[sections.length - 1 - sectionIndex];
-      resultDiv.textContent = `축하합니다! ${selectedSection}에 당첨되셨습니다!`;
-    }, 4000); // 4초 동안 회전 후 결과 출력
+      const finalAngle = currentRotation % 360; // 360도로 나눈 나머지를 이용하여 최종 각도 계산
+
+      // 해당 각도가 어느 섹션에 있는지 확인
+      const selectedSection = sections.find(section =>
+          finalAngle >= section.startAngle && finalAngle < section.endAngle
+      );
+
+      resultDiv.textContent = `축하합니다! ${selectedSection.name}에 당첨되셨습니다!`;
+
+      isSpinning = false; // 룰렛이 멈추면 다시 회전 가능하게 설정
+    }, randomTime * 1000); // 랜덤 시간 동안 회전 후 결과 출력
   }
 
   spinButton.addEventListener("click", spinWheel);
