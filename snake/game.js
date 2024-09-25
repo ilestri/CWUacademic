@@ -6,6 +6,7 @@ const ROWS = canvas.height / SCALE;
 const COLUMNS = canvas.width / SCALE;
 
 let score = 0;
+let speed = 250; // 스네이크의 초기 속도 (밀리초)
 let snake, fruit, gameRunning = false;
 let lastRenderTime = 0;
 
@@ -118,6 +119,7 @@ class Snake {
     this.ySpeed = 0;
     this.tail = [];
     score = 0;
+    speed = 250; // 게임 초기화 시 속도도 초기화
     document.getElementById("score").textContent = score;
   }
 }
@@ -164,7 +166,7 @@ function gameLoop(currentTime) {
     return;
   }
 
-  if (currentTime - lastRenderTime >= 250) {
+  if (currentTime - lastRenderTime >= speed) { // 속도에 따라 게임 루프 조정
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawBorder();
     fruit.draw();
@@ -175,6 +177,11 @@ function gameLoop(currentTime) {
       score++;
       document.getElementById("score").textContent = score;
       fruit.pickLocation();
+
+      // 속도 증가: 먹이를 먹을 때마다 속도가 더 빨라짐
+      if (speed > 50) { // 최소 속도를 제한하여 너무 빠르지 않도록
+        speed -= 10; // 속도를 10ms씩 줄임
+      }
     }
 
     snake.checkCollision();
