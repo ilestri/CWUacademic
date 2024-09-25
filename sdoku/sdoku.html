@@ -102,6 +102,11 @@
       margin-top: 20px;
     }
 
+    #start-all-btn:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+
     #explanation-btn {
       margin-top: 10px;
       background-color: #2196f3;
@@ -278,6 +283,10 @@
 
   // 백트래킹 및 휴리스틱 시작 버튼 핸들러
   document.getElementById('start-all-btn').addEventListener('click', () => {
+    const startBtn = document.getElementById('start-all-btn');
+    startBtn.disabled = true; // 버튼 비활성화
+    startBtn.style.backgroundColor = '#ccc'; // 회색으로 변경
+
     createEditableBoard('backtracking-board', boards.backtracking);
     createEditableBoard('heuristic-board', boards.heuristic);
     startTimer('backtracking');

@@ -33,18 +33,17 @@
       border-radius: 50%;
       border: 5px solid #fafafa;
       background-image: conic-gradient(
-          #F0EBCA 0deg 96deg, /* 상품 1: 첫번째 96도 */
-          #c6ebc5 96deg 146.4deg, /* 상품 2: 50.4도 */
-          #F0EBCA 146.4deg 242.4deg, /* 상품 1: 두번째 96도 */
-          #a1c298 242.4deg 260.4deg, /* 상품 3: 18도 */
-          #F0EBCA 260.4deg 356.4deg, /* 상품 1: 세번째 96도 */
-          #fa7070 356.4deg 360deg /* 상품 4: 3.6도 */
+          #F0EBCA 0deg 100.8deg, /* 과자 (28%) */
+          #c6ebc5 100.8deg 136.8deg, /* 커피 기프티콘 (10%) */
+          #F0EBCA 136.8deg 237.6deg, /* 과자 (28%) */
+          #a1c298 237.6deg 255.6deg, /* 치킨 기프티콘 (5%) */
+          #F0EBCA 255.6deg 356.4deg, /* 과자 (28%) */
+          #fa7070 356.4deg 360deg /* 스뎅리 (1%) */
       );
       transition-timing-function: ease-out;
     }
 
     #roulette-pointer {
-      
       position: absolute;
       top: -30px;
       left: 50%;
@@ -69,6 +68,11 @@
 
     #spin-button:hover {
       background-color: #45a049;
+    }
+
+    #spin-button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
     }
 
     #result {
@@ -114,19 +118,19 @@
 <div class="legend">
   <div class="legend-item">
     <div class="legend-color" style="background-color: #F0EBCA;"></div>
-    <span>상품 1 (80%)</span>
+    <span>과자 (84%)</span>
   </div>
   <div class="legend-item">
     <div class="legend-color" style="background-color: #c6ebc5;"></div>
-    <span>상품 2 (14%)</span>
+    <span>커피 기프티콘 (10%)</span>
   </div>
   <div class="legend-item">
     <div class="legend-color" style="background-color: #a1c298;"></div>
-    <span>상품 3 (5%)</span>
+    <span>치킨 기프티콘 (5%)</span>
   </div>
   <div class="legend-item">
     <div class="legend-color" style="background-color: #fa7070;"></div>
-    <span>상품 4 (1%)</span>
+    <span>스뎅리 (1%)</span>
   </div>
 </div>
 
@@ -143,12 +147,12 @@
 
   // 룰렛 섹션 텍스트 및 확률
   const sections = [
-    {name: "상품 1", startAngle: 0, endAngle: 96},
-    {name: "상품 2", startAngle: 96, endAngle: 146.4},
-    {name: "상품 1", startAngle: 146.4, endAngle: 242.4},
-    {name: "상품 3", startAngle: 242.4, endAngle: 260.4},
-    {name: "상품 1", startAngle: 260.4, endAngle: 356.4},
-    {name: "상품 4", startAngle: 356.4, endAngle: 360}
+    {name: "과자", startAngle: 0, endAngle: 100.8},
+    {name: "커피 기프티콘", startAngle: 100.8, endAngle: 136.8},
+    {name: "과자", startAngle: 136.8, endAngle: 237.6},
+    {name: "치킨 기프티콘", startAngle: 237.6, endAngle: 255.6},
+    {name: "과자", startAngle: 255.6, endAngle: 356.4},
+    {name: "스뎅리", startAngle: 356.4, endAngle: 360}
   ];
 
   let isSpinning = false; // 현재 룰렛이 회전 중인지 확인하는 변수
@@ -160,6 +164,8 @@
     } // 룰렛이 돌고 있을 때는 중복 클릭을 방지
 
     isSpinning = true; // 룰렛 회전 시작
+    spinButton.disabled = true; // 버튼 비활성화
+    spinButton.style.backgroundColor = '#cccccc'; // 버튼 색상 회색으로 변경
 
     const randomDegree = Math.floor(Math.random() * 360) + 2000; // 최소 2000도 회전
     const randomTime = Math.random() * 2 + 5; // 회전 시간 5초에서 7초 사이 랜덤하게 설정
@@ -174,11 +180,12 @@
     // 룰렛이 멈춘 후 결과 계산
     setTimeout(() => {
       const finalAngle = currentRotation % 360; // 360도로 나눈 나머지를 이용하여 최종 각도 계산
+      const pointerAngle = (360 - finalAngle) % 360; // 포인터가 가리키는 위치 보정
 
       // 해당 각도가 어느 섹션에 있는지 확인
       let selectedSection = sections[0]; // 기본으로 첫 섹션을 선택
       for (let section of sections) {
-        if (finalAngle >= section.startAngle && finalAngle < section.endAngle) {
+        if (pointerAngle >= section.startAngle && pointerAngle < section.endAngle) {
           selectedSection = section;
           break;
         }
