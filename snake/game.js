@@ -180,7 +180,7 @@ function gameLoop(currentTime) {
 
       // 속도 증가: 먹이를 먹을 때마다 속도가 더 빨라짐
       if (speed > 50) { // 최소 속도를 제한하여 너무 빠르지 않도록
-        speed -= 10; // 속도를 10ms씩 줄임
+        speed -= 5; // 속도를 10ms씩 줄임
       }
     }
 
