@@ -19,7 +19,7 @@ async function backtrackingSolver() {
     }
 
     if (boards.backtracking[row][col] !== 0) {
-      return solve(row, col + 1); // 이미 채워진 셀은 다음 셀로
+      return solve(row, col + 1); // 이미 채워진 셀은 다음 셀로아
     }
 
     // 1부터 9까지 가능한 숫자 넣기

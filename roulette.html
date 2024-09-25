@@ -7,7 +7,7 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #F0F0F0;
+      background-color: #f0f0f0;
       margin: 0;
       padding: 20px;
       color: #333;
@@ -31,19 +31,20 @@
       width: 100%;
       height: 100%;
       border-radius: 50%;
-      border: 10px solid #4CAF50;
+      border: 5px solid #fafafa;
       background-image: conic-gradient(
-          #ff0036 0deg 96deg,   /* 상품 1: 첫번째 96도 */
-          #0098ff 96deg 146.4deg, /* 상품 2: 50.4도 */
-          #ff0036 146.4deg 242.4deg,  /* 상품 1: 두번째 96도 */
-          #ffb500 242.4deg 260.4deg,  /* 상품 3: 18도 */
-          #ff0036 260.4deg 356.4deg,  /* 상품 1: 세번째 96도 */
-          #00ffff 356.4deg 360deg  /* 상품 4: 3.6도 */
+          #F0EBCA 0deg 96deg, /* 상품 1: 첫번째 96도 */
+          #c6ebc5 96deg 146.4deg, /* 상품 2: 50.4도 */
+          #F0EBCA 146.4deg 242.4deg, /* 상품 1: 두번째 96도 */
+          #a1c298 242.4deg 260.4deg, /* 상품 3: 18도 */
+          #F0EBCA 260.4deg 356.4deg, /* 상품 1: 세번째 96도 */
+          #fa7070 356.4deg 360deg /* 상품 4: 3.6도 */
       );
       transition-timing-function: ease-out;
     }
 
     #roulette-pointer {
+      
       position: absolute;
       top: -30px;
       left: 50%;
@@ -52,7 +53,7 @@
       height: 0;
       border-left: 15px solid transparent;
       border-right: 15px solid transparent;
-      border-top: 30px solid red;
+      border-top: 30px solid #354a21;
     }
 
     #spin-button {
@@ -112,22 +113,28 @@
 <!-- 상품 범례 -->
 <div class="legend">
   <div class="legend-item">
-    <div class="legend-color" style="background-color: #ff0036;"></div>
+    <div class="legend-color" style="background-color: #F0EBCA;"></div>
     <span>상품 1 (80%)</span>
   </div>
   <div class="legend-item">
-    <div class="legend-color" style="background-color: #0098ff;"></div>
+    <div class="legend-color" style="background-color: #c6ebc5;"></div>
     <span>상품 2 (14%)</span>
   </div>
   <div class="legend-item">
-    <div class="legend-color" style="background-color: #ffb500;"></div>
+    <div class="legend-color" style="background-color: #a1c298;"></div>
     <span>상품 3 (5%)</span>
   </div>
   <div class="legend-item">
-    <div class="legend-color" style="background-color: #00ffff;"></div>
+    <div class="legend-color" style="background-color: #fa7070;"></div>
     <span>상품 4 (1%)</span>
   </div>
 </div>
+
+<!-- index.html로 이동하는 버튼 -->
+<button onclick="location.href='index.html'"
+        style="margin-top: 40px; background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 5px; font-size: 1rem; cursor: pointer;">
+  메인 페이지로 돌아가기
+</button>
 
 <script>
   const wheel = document.getElementById("roulette-wheel");
@@ -136,19 +143,21 @@
 
   // 룰렛 섹션 텍스트 및 확률
   const sections = [
-    { name: "상품 1", startAngle: 0, endAngle: 96 },
-    { name: "상품 2", startAngle: 96, endAngle: 146.4 },
-    { name: "상품 1", startAngle: 146.4, endAngle: 242.4 },
-    { name: "상품 3", startAngle: 242.4, endAngle: 260.4 },
-    { name: "상품 1", startAngle: 260.4, endAngle: 356.4 },
-    { name: "상품 4", startAngle: 356.4, endAngle: 360 }
+    {name: "상품 1", startAngle: 0, endAngle: 96},
+    {name: "상품 2", startAngle: 96, endAngle: 146.4},
+    {name: "상품 1", startAngle: 146.4, endAngle: 242.4},
+    {name: "상품 3", startAngle: 242.4, endAngle: 260.4},
+    {name: "상품 1", startAngle: 260.4, endAngle: 356.4},
+    {name: "상품 4", startAngle: 356.4, endAngle: 360}
   ];
 
   let isSpinning = false; // 현재 룰렛이 회전 중인지 확인하는 변수
   let currentRotation = 0; // 현재 회전각을 저장하는 변수
 
   function spinWheel() {
-    if (isSpinning) return; // 룰렛이 돌고 있을 때는 중복 클릭을 방지
+    if (isSpinning) {
+      return;
+    } // 룰렛이 돌고 있을 때는 중복 클릭을 방지
 
     isSpinning = true; // 룰렛 회전 시작
 
@@ -167,9 +176,13 @@
       const finalAngle = currentRotation % 360; // 360도로 나눈 나머지를 이용하여 최종 각도 계산
 
       // 해당 각도가 어느 섹션에 있는지 확인
-      const selectedSection = sections.find(section =>
-          finalAngle >= section.startAngle && finalAngle < section.endAngle
-      );
+      let selectedSection = sections[0]; // 기본으로 첫 섹션을 선택
+      for (let section of sections) {
+        if (finalAngle >= section.startAngle && finalAngle < section.endAngle) {
+          selectedSection = section;
+          break;
+        }
+      }
 
       resultDiv.textContent = `축하합니다! ${selectedSection.name}에 당첨되셨습니다!`;
 
